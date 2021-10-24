@@ -6,6 +6,11 @@ using System.Threading;
 
 namespace CloxCodeGen
 {
+    /// <summary>
+    /// To Run, 
+    ///     - cd <path>/CloxCodenGen
+    ///     - dotnet run ..\Clox
+    /// </summary>
     class Program
     {
         static void Main(string[] args)
@@ -20,9 +25,9 @@ namespace CloxCodeGen
             DefineAst(outputDirectory, "Expr", new List<string>
             {
                 "Binary : Expr left, Token @operator, Expr right",
-                "Grouping : Expr left, Token @operator, Expr right",
-                "Literal : Expr left, Token @operator, Expr right",
-                "Unary : Expr left, Token @operator, Expr right",
+                "Grouping : Expr expression",
+                "Literal : System.Object value",
+                "Unary : Token @operator, Expr right",
             });
         }
 
@@ -43,7 +48,7 @@ namespace CloxCodeGen
             writer.WriteLine();
 
             // base Accept method
-            writer.WriteLine($"\t\tpublic abstract void Accept(IVisitor visitor);");
+            writer.WriteLine($"\t\tpublic abstract T Accept<T>(IVisitor<T> visitor);");
             writer.WriteLine();
 
             // Concrete type implementations
@@ -62,13 +67,13 @@ namespace CloxCodeGen
 
         private static void DefineVisitor(StreamWriter writer, string baseName, IEnumerable<string> types)
         {
-            writer.WriteLine($"\t\tpublic interface IVisitor");
+            writer.WriteLine($"\t\tpublic interface IVisitor<T>");
             writer.WriteLine("\t\t{");
 
             foreach (var type in types)
             {
                 string typeName = type.Split(":")[0].Trim();
-                writer.WriteLine($"\t\t\tpublic void Visit{typeName}{baseName}({typeName} {baseName.ToLower()});");
+                writer.WriteLine($"\t\t\tpublic T Visit{typeName}{baseName}({typeName} {baseName.ToLower()});");
             }
 
             writer.WriteLine("\t\t}");
@@ -105,9 +110,9 @@ namespace CloxCodeGen
             writer.WriteLine();
 
             // Implement interface
-            writer.WriteLine("\t\t\tpublic override void Accept(IVisitor visitor)");
+            writer.WriteLine("\t\t\tpublic override T Accept<T>(IVisitor<T> visitor)");
             writer.WriteLine("\t\t\t{");
-            writer.WriteLine($"\t\t\t\tvisitor.Visit{className}{baseName}(this);");
+            writer.WriteLine($"\t\t\t\treturn visitor.Visit{className}{baseName}(this);");
             writer.WriteLine("\t\t\t}");
 
             writer.WriteLine("\t\t}");
