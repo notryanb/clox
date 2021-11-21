@@ -62,15 +62,34 @@ namespace Clox
             }
         }
 
+        public static void Error(Token token, string message)
+        {
+            if (token.Type == TokenType.EOF)
+            {
+                Report(token.Line, " at end", message);
+            }
+            else
+            {
+                Report(token.Line, " at '" + token.Lexeme + "'", message);
+            }
+        }
+
         private static void Run(string source)
         {
             Scanner scanner = new Scanner(source);
             List<Token> tokens = scanner.ScanTokens();
 
-            foreach (var token in tokens)
-            {
-                Console.WriteLine(token);
-            }
+            Parser parser = new Parser(tokens);
+            Expr expression = parser.Parse();
+
+            if (HadError) return;
+
+            Console.WriteLine(new AstPrinter().Print(expression));
+
+            //foreach (var token in tokens)
+            //{
+            //    Console.WriteLine(token);
+            //}
         }
 
         public static void Error(int line, string message)
