@@ -161,7 +161,7 @@ namespace Clox
 
         private ParseException Error(Token token, string message)
         {
-            Error(token, message);
+            Clox.Program.Error(token, message);
             return new ParseException();
         }
 
