@@ -6,7 +6,9 @@ namespace Clox
 {
     class Program
     {
-        static Boolean HadError = false;
+        private static bool HadError = false;
+        private static bool HadRuntimeError = false;
+        private static readonly Interpreter _interpreter = new Interpreter();
 
         static void Main(string[] args)
         {
@@ -48,6 +50,13 @@ namespace Clox
                 Environment.ExitCode = 65;
                 return;
             }
+
+            if (HadRuntimeError)
+            {
+                // Might want to look into exiting with system error codes.
+                Environment.ExitCode = 70;
+                return;
+            }
         }
 
         private static void RunPrompt()
@@ -74,6 +83,15 @@ namespace Clox
             }
         }
 
+
+        public static void RuntimeError(LoxRuntimeError error)
+        {
+            Console.WriteLine(error.Message);
+            Console.WriteLine($"[line {error.Token.Line} ]");
+
+            HadRuntimeError = true;            
+        }
+
         private static void Run(string source)
         {
             Scanner scanner = new Scanner(source);
@@ -83,8 +101,9 @@ namespace Clox
             Expr expression = parser.Parse();
 
             if (HadError) return;
+            _interpreter.Interpret(expression);
 
-            Console.WriteLine(new AstPrinter().Print(expression));
+            //Console.WriteLine(new AstPrinter().Print(expression));
 
             //foreach (var token in tokens)
             //{
