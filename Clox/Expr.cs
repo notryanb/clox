@@ -48,9 +48,9 @@ namespace Clox
 
 		public class Literal : Expr 
 		{
-			public System.Object Value;
+			public object Value;
 
-			public Literal(System.Object value)
+			public Literal(object value)
 			{
 				Value = value;
 			}
