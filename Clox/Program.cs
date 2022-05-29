@@ -98,10 +98,10 @@ namespace Clox
             List<Token> tokens = scanner.ScanTokens();
 
             Parser parser = new Parser(tokens);
-            Expr expression = parser.Parse();
+            IList<Stmt> statements = parser.Parse();
 
             if (HadError) return;
-            _interpreter.Interpret(expression);
+            _interpreter.Interpret(statements);
 
             //Console.WriteLine(new AstPrinter().Print(expression));
 

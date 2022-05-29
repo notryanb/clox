@@ -29,6 +29,12 @@ namespace CloxCodeGen
                 "Literal : System.Object value",
                 "Unary : Token @operator, Expr right",
             });
+
+            DefineAst(outputDirectory, "Stmt", new List<string>
+            {
+                "Expression : Expr expression",
+                "Print : Expr expression",
+            });
         }
 
         private static void DefineAst(string outputDirectory, string baseName, IList<string> types)

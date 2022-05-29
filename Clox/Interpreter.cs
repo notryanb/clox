@@ -1,20 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Clox
 {
-    public class Interpreter : Expr.IVisitor<object>
+    public class Interpreter : Expr.IVisitor<object>, Stmt.IVisitor<object>
     {
-        public void Interpret(Expr expression)
+        public void Interpret(IList<Stmt> statements)
         {
             try
             {
-                object value = Evaluate(expression);
-                Console.WriteLine(Stringify(value));
+                foreach (var statement in statements)
+                {
+                    Execute(statement);
+                }
             }
             catch (LoxRuntimeError ex)
             {
                 Program.RuntimeError(ex);
             }
+        }
+
+        private void Execute(Stmt statement)
+        {
+            statement.Accept(this);
         }
 
         private string Stringify(object obj)
@@ -134,6 +142,19 @@ namespace Clox
         {
             if (operand != 0) return operand;
             throw new LoxRuntimeError(tokenOp, "Can't divide by Zero.");
+        }
+
+        public object VisitExpressionStmt(Stmt.Expression stmt)
+        {
+            Evaluate(stmt.ExpressionValue);
+            return null;
+        }
+
+        public object VisitPrintStmt(Stmt.Print stmt)
+        {
+            object value = Evaluate(stmt.ExpressionValue);
+            Console.WriteLine(Stringify(value));
+            return null;
         }
     }
 }
